@@ -2,6 +2,7 @@ package com.hiarias.webasync.server
 
 import com.hiarias.webasync.http.server.ServerHttpRequest
 import com.hiarias.webasync.http.ServerHttpResponse
+import kotlinx.coroutines.Deferred
 import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContext
 import org.springframework.http.codec.multipart.Part
@@ -28,7 +29,7 @@ interface ServerWebExchange {
 
     suspend fun getSession(): WebSession
 
-    suspend fun <T : Principal> getPrincipal(): T
+    val principal: Deferred<Principal>
 
     suspend fun getFormData(): MultiValueMap<String, String>
 
@@ -52,9 +53,9 @@ interface ServerWebExchange {
 
     val logPrefix: String
 
-//    fun mutate(): Builder {
-//        return DefaultServerWebExchangeBuilder(this)
-//    }
+    fun mutate(): Builder {
+        return DefaultServerWebExchangeBuilder(this)
+    }
 
     interface Builder {
         fun request(requestBuilderConsumer: (ServerHttpRequest.Builder) -> Unit): Builder
@@ -63,7 +64,7 @@ interface ServerWebExchange {
 
         fun response(response: ServerHttpResponse): Builder
 
-        fun principal(principalCoroutine: suspend () -> Principal): Builder
+        fun principal(principal: Deferred<Principal>): Builder
 
         fun build(): ServerWebExchange
     }

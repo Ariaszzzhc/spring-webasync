@@ -1,6 +1,7 @@
 package com.hiarias.webasync.http.server
 
 import com.hiarias.webasync.http.AsyncHttpInputMessage
+import com.hiarias.webasync.http.server.ServerHttpRequest.*
 import org.springframework.http.HttpCookie
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -24,11 +25,9 @@ interface ServerHttpRequest : HttpRequest, AsyncHttpInputMessage {
 
     val version: String
 
-//    fun mutate(): ServerHttpRequest.Builder {
-//        return DefaultServerHttpRequestBuilder(this)
-//    }
-//
-//
+    fun mutate(): Builder {
+        return DefaultServerHttpRequestBuilder(this)
+    }
 
     interface Builder {
         fun method(httpMethod: HttpMethod): Builder

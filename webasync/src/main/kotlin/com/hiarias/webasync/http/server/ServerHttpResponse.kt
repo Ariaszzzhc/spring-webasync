@@ -7,5 +7,5 @@ import org.springframework.util.MultiValueMap
 
 interface ServerHttpResponse : AsyncHttpOutputMessage {
     var statusCode: HttpStatus
-    val cookie: MultiValueMap<String, ResponseCookie>
+    val cookies: MultiValueMap<String, ResponseCookie>
 }
