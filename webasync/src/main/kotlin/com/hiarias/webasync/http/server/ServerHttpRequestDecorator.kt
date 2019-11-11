@@ -13,8 +13,6 @@ class ServerHttpRequestDecorator(
 
     override val remoteAddress = delegate.remoteAddress
 
-    override val sslInfo = delegate.sslInfo
-
     override val version = delegate.version
 
     override fun getHeaders() = delegate.headers

@@ -1,7 +1,6 @@
 package com.hiarias.webasync.http.server
 
 import com.hiarias.webasync.http.AsyncHttpInputMessage
-import com.hiarias.webasync.http.server.ServerHttpRequest.*
 import org.springframework.http.HttpCookie
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod

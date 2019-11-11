@@ -6,6 +6,8 @@ import org.springframework.http.ResponseCookie
 import org.springframework.util.MultiValueMap
 
 interface ServerHttpResponse : AsyncHttpOutputMessage {
-    var statusCode: HttpStatus
     val cookies: MultiValueMap<String, ResponseCookie>
+    fun setStatusCode(status: HttpStatus?): Boolean
+    fun getStatusCode(): HttpStatus?
+    fun addCookie(cookie: ResponseCookie)
 }

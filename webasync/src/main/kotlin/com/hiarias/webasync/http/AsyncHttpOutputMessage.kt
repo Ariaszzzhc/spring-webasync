@@ -5,7 +5,7 @@ import org.springframework.core.io.buffer.DataBufferFactory
 import org.springframework.http.HttpMessage
 
 interface AsyncHttpOutputMessage : HttpMessage {
-    val bufferFactory: DataBufferFactory
+    val dataBufferFactory: DataBufferFactory
 
     suspend fun writeWith(body: DataBuffer)
 }

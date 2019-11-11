@@ -9,45 +9,53 @@ import io.ktor.util.toMap
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferFactory
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseCookie
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 import java.io.File
 
 class AsyncServerHttpResponse(
     private val response: ApplicationResponse,
-    override val bufferFactory: DataBufferFactory
-) : ServerHttpResponse, ZeroCopyHttpOutputMessage {
+    dataBufferFactory: DataBufferFactory
+) : AbstractServerHttpResponse(dataBufferFactory, initHeaders(response)), ZeroCopyHttpOutputMessage {
+    override suspend fun writeWithInternal(body: DataBuffer) {
+        this.response.call.respond(body)
+    }
 
-    override val cookies: MultiValueMap<String, ResponseCookie> = LinkedMultiValueMap()
-
-    private val headers: HttpHeaders = HttpHeaders().apply {
-        response.headers.allValues().toMap().forEach { (key, value) ->
-            this.addAll(key, value)
+    override fun applyStatusCode() {
+        val statusCode = getStatusCode()
+        if (statusCode != null) {
+            this.response.status(HttpStatusCode.fromValue(statusCode.value()))
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T> getNativeResponse(): T {
-        return this.response as T
+    override fun applyHeaders() {
+//        this.headers.forEach { (key, value) ->
+//            value.forEach {
+//                this.response.headers.append(key, it)
+//            }
+//        }
+    }
+
+    override fun applyCookies() {
+        this.cookies.forEach { (key, value) ->
+            value.forEach {
+                this.response.cookies.append(key, it.value)
+            }
+        }
     }
 
     override suspend fun writeWith(file: File) {
-        response.call.respondFile(file)
+        this.response.call.respondFile(file)
     }
 
-    override fun getHeaders() = this.headers
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> getNativeResponse(): T {
+        return this.response as T
+    }
 
-    override var statusCode: HttpStatus
-        get() = this.response.status().let {
-            HttpStatus.resolve(it!!.value)!!
+    companion object {
+        fun initHeaders(response: ApplicationResponse): HttpHeaders = HttpHeaders().apply {
+            response.headers.allValues().toMap().forEach { (key, value) ->
+                this.addAll(key, value)
+            }
         }
-        set(value) {
-            this.response.status(HttpStatusCode(value.value(), value.reasonPhrase))
-        }
-
-    override suspend fun writeWith(body: DataBuffer) {
-        response.call.respond(body)
     }
 }

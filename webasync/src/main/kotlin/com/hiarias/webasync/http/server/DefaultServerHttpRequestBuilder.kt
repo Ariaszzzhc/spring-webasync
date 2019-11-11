@@ -7,7 +7,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.server.RequestPath
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
-import org.springframework.util.ObjectUtils
 import java.net.URI
 import java.util.*
 
@@ -84,15 +83,18 @@ class DefaultServerHttpRequestBuilder(
         }
 
         class MutatedServerHttpRequest(
-            private val uri: URI,
+            uri: URI,
             contextPath: String,
-            private val headers: HttpHeaders,
+            headers: HttpHeaders,
             private val methodValue: String,
             override val cookies: MultiValueMap<String, HttpCookie>,
             private val bodyFunction: suspend () -> DataBuffer,
             original: ServerHttpRequest
-        ) : ServerHttpRequest {
-            override val id: String = ObjectUtils.getIdentityHexString(this)
+        ) : AbstractServerHttpRequest(uri, contextPath, headers) {
+
+            override fun initCookies(): MultiValueMap<String, HttpCookie> = this.cookies
+
+            override val id: String = original.id
             override val path: RequestPath = RequestPath.parse(uri, contextPath)
 
             override val queryParams = original.queryParams
@@ -100,17 +102,7 @@ class DefaultServerHttpRequestBuilder(
 
             override val version = original.version
 
-            override fun getHeaders(): HttpHeaders {
-                return headers
-            }
-
-            override fun getMethodValue(): String {
-                return methodValue
-            }
-
-            override fun getURI(): URI {
-                return uri
-            }
+            override fun getMethodValue() = this.methodValue
 
             override suspend fun getBody() = bodyFunction.invoke()
         }
