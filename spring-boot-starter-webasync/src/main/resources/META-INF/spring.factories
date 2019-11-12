@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration = \
+  com.hiarias.boot.webasync.autoconfigure.NettyWebAsyncAutoConfiguration, \
+  com.hiarias.boot.webasync.autoconfigure.CIOWebAsyncAutoConfiguration

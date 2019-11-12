@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.3.50"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.3.50"
 }
 
 subprojects {
@@ -13,4 +14,5 @@ subprojects {
 
     apply(plugin = "optional")
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "kotlin-spring")
 }
