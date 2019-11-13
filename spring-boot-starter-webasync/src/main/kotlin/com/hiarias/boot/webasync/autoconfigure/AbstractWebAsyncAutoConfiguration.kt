@@ -15,6 +15,7 @@ import io.ktor.sessions.Sessions
 import org.springframework.beans.BeanUtils
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties
 import org.springframework.context.ApplicationContext
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.util.ClassUtils
 
@@ -29,16 +30,14 @@ abstract class AbstractWebAsyncAutoConfiguration(
         applicationEngineFactory: ApplicationEngineFactory<*, *>,
         context: ApplicationContext
     ): ApplicationEngine {
-        val resolver = RouteResolver(context)
+        val resolver = RouteResolver(context as ConfigurableApplicationContext)
 
         return embeddedServer(applicationEngineFactory, properties.port, properties.host) {
             installFeatures(jacksonProperties)
 
             routing {
                 route("/") {
-                    resolver.resolve().forEach {
-                        TODO()
-                    }
+                    resolver.resolve(this)
                 }
             }
 

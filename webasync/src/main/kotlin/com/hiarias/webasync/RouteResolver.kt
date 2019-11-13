@@ -1,13 +1,52 @@
 package com.hiarias.webasync
 
-import org.springframework.context.ApplicationContext
+import com.hiarias.webasync.result.method.HandlerMethodArgumentResolver
+import com.hiarias.webasync.result.method.annotation.*
+import io.ktor.http.HttpMethod
+import io.ktor.routing.Route
+import io.ktor.routing.route
+import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.support.ConfigurableWebBindingInitializer
 
 class RouteResolver(
-    private val context: ApplicationContext
+    private val context: ConfigurableApplicationContext
 ) {
+    private val factory = context.beanFactory
 
-    fun resolve(): List<RouteDefinition> {
+    private val argumentResolvers: List<HandlerMethodArgumentResolver> = listOf(
+        RequestHeaderMethodArgumentResolver(factory),
+        RequestParamMethodArgumentResolver(factory, true),
+        PathVariableMethodArgumentResolver(factory),
+        CookieValueMethodArgumentResolver(factory)
+    )
+
+    fun resolve(route: Route) {
+        val bindingContext = BindingContext(ConfigurableWebBindingInitializer())
+
+        generateRouteDefinitions().forEach { definition ->
+            val parameterNameDiscoverer = LocalVariableTableParameterNameDiscoverer()
+            val method = definition.method
+
+            definition.methods.forEach { requestMethod ->
+                definition.path.forEach { path ->
+                    route.route(path, HttpMethod.parse(requestMethod.name)) {
+                        handle {
+                            handleParameter(
+                                method,
+                                parameterNameDiscoverer,
+                                bindingContext,
+                                argumentResolvers
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun generateRouteDefinitions(): List<RouteDefinition> {
         val beans = context.getBeansWithAnnotation(RestController::class.java)
 
         return beans.flatMap { bean ->
