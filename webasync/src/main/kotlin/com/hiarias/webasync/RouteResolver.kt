@@ -24,7 +24,8 @@ class RouteResolver(
         RequestHeaderMethodArgumentResolver(factory),
         RequestParamMethodArgumentResolver(factory, true),
         PathVariableMethodArgumentResolver(factory),
-        CookieValueMethodArgumentResolver(factory)
+        CookieValueMethodArgumentResolver(factory),
+        RequestBodyMethodArgumentResolver()
     )
 
     fun resolve(route: Route) {

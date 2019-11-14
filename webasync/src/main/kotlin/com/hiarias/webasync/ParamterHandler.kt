@@ -15,7 +15,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleParameter(
     bindingContext: BindingContext,
     argumentResolvers: List<HandlerMethodArgumentResolver>
 ): List<Any?> {
-    val ret = arrayListOf<Any?>()
+    val resolvedArguments = arrayListOf<Any?>()
 
     for ((index, param) in method.parameters.withIndex()) {
         if (param.type == Continuation::class.java) {
@@ -27,14 +27,15 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleParameter(
 
         for (resolver in argumentResolvers) {
             if (resolver.supportsParameter(mp)) {
+                val arg = resolver.resolveArgument(mp, bindingContext, call)
                 try {
-                    ret[index] = resolver.resolveArgument(mp, bindingContext, call)
+                    resolvedArguments[index] = arg
                 } catch (e: IndexOutOfBoundsException) {
-                    ret.add(index, resolver.resolveArgument(mp, bindingContext, call))
+                    resolvedArguments.add(index, arg)
                 }
             }
         }
     }
 
-    return ret
+    return resolvedArguments
 }
