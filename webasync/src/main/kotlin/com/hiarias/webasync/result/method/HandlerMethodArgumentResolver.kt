@@ -7,5 +7,5 @@ import org.springframework.core.MethodParameter
 interface HandlerMethodArgumentResolver {
     fun supportsParameter(parameter: MethodParameter): Boolean
 
-    suspend fun resolveArgument(parameter: MethodParameter, bindingContext: BindingContext, applicationCall: ApplicationCall): Any
+    suspend fun resolveArgument(parameter: MethodParameter, bindingContext: BindingContext, applicationCall: ApplicationCall): Any?
 }

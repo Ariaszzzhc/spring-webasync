@@ -18,7 +18,7 @@ class PathVariableMethodArgumentResolver(
     }
 
     override suspend fun resolveName(name: String, parameter: MethodParameter, applicationCall: ApplicationCall): Any? {
-        return applicationCall.request.queryParameters[name]
+        return applicationCall.parameters[name]
     }
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
@@ -40,7 +40,7 @@ class PathVariableMethodArgumentResolver(
         model: Model,
         applicationCall: ApplicationCall
     ) {
-        TODO("not implement yet")
+        //TODO
     }
 
     companion object {

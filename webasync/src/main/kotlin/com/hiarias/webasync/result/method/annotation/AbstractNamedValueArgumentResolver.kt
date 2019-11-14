@@ -25,7 +25,7 @@ abstract class AbstractNamedValueArgumentResolver(
 
     override suspend fun resolveArgument(
         parameter: MethodParameter, bindingContext: BindingContext, applicationCall: ApplicationCall
-    ): Any {
+    ): Any? {
 
         val namedValueInfo = getNamedValueInfo(parameter)
         val nestedParameter = parameter.nestedIfOptional()
@@ -123,7 +123,7 @@ abstract class AbstractNamedValueArgumentResolver(
     private fun getDefaultValue(
         namedValueInfo: NamedValueInfo, parameter: MethodParameter,
         bindingContext: BindingContext, model: Model, applicationCall: ApplicationCall
-    ): Any {
+    ): Any? {
         var value: Any? = null
         if (namedValueInfo.defaultValue != null) {
             value = resolveStringValue(namedValueInfo.defaultValue)
@@ -133,7 +133,7 @@ abstract class AbstractNamedValueArgumentResolver(
         value = handleNullValue(value, parameter.nestedParameterType)
         value = applyConversion(value, namedValueInfo, parameter, bindingContext, applicationCall)
         handleResolvedValue(value, namedValueInfo.name, parameter, model, applicationCall)
-        return value!!
+        return value
     }
 
     private fun applyConversion(

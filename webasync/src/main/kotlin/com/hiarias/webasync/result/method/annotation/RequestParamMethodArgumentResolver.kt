@@ -15,7 +15,7 @@ class RequestParamMethodArgumentResolver(
 ) : AbstractNamedValueArgumentResolver(configurableBeanFactory) {
     override fun createNamedValueInfo(parameter: MethodParameter): AbstractNamedValueArgumentResolver.Companion.NamedValueInfo {
         val ann = parameter.getParameterAnnotation(RequestParam::class.java)
-        return if(ann == null) {
+        return if(ann != null) {
             RequestParamNamedValueInfo(ann)
         } else {
             RequestParamNamedValueInfo()
@@ -38,6 +38,11 @@ class RequestParamMethodArgumentResolver(
     }
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
+        if (checkAnnotatedParam(parameter, RequestParam::class.java, ::singleParam)) {
+            return true
+        }
+
+
         return when {
             checkAnnotatedParam(parameter, RequestParam::class.java, ::singleParam) -> true
             this.useDefaultResolution -> checkParameterType(parameter, BeanUtils::isSimpleProperty) or BeanUtils.isSimpleProperty(parameter.nestedIfOptional().nestedParameterType)

@@ -14,22 +14,27 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleParameter(
     parameterNameDiscoverer: ParameterNameDiscoverer,
     bindingContext: BindingContext,
     argumentResolvers: List<HandlerMethodArgumentResolver>
-) {
-    method.parameters.forEachIndexed { index, parameter ->
-        val value = when (parameter.type) {
-            Continuation::class.java -> null
-            else -> {
-                var result: Any? = null
-                val methodParameter = MethodParameter(method, index)
-                methodParameter.initParameterNameDiscovery(parameterNameDiscoverer)
-                //TODO cache resolver
-                for (resolver in argumentResolvers) {
-                    if (resolver.supportsParameter(methodParameter)) {
-                        result = resolver.resolveArgument(methodParameter, bindingContext, call)
-                    }
+): List<Any?> {
+    val ret = arrayListOf<Any?>()
+
+    for ((index, param) in method.parameters.withIndex()) {
+        if (param.type == Continuation::class.java) {
+            continue
+        }
+
+        val mp = MethodParameter(method, index)
+        mp.initParameterNameDiscovery(parameterNameDiscoverer)
+
+        for (resolver in argumentResolvers) {
+            if (resolver.supportsParameter(mp)) {
+                try {
+                    ret[index] = resolver.resolveArgument(mp, bindingContext, call)
+                } catch (e: IndexOutOfBoundsException) {
+                    ret.add(index, resolver.resolveArgument(mp, bindingContext, call))
                 }
-                result
             }
         }
     }
+
+    return ret
 }

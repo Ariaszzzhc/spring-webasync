@@ -2,13 +2,18 @@ package com.hiarias.webasync
 
 import com.hiarias.webasync.result.method.HandlerMethodArgumentResolver
 import com.hiarias.webasync.result.method.annotation.*
+import io.ktor.application.call
 import io.ktor.http.HttpMethod
+import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.route
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer
+import org.springframework.core.KotlinReflectionParameterNameDiscoverer
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.support.ConfigurableWebBindingInitializer
+import kotlin.reflect.full.callSuspend
+import kotlin.reflect.jvm.kotlinFunction
 
 class RouteResolver(
     private val context: ConfigurableApplicationContext
@@ -26,19 +31,28 @@ class RouteResolver(
         val bindingContext = BindingContext(ConfigurableWebBindingInitializer())
 
         generateRouteDefinitions().forEach { definition ->
-            val parameterNameDiscoverer = LocalVariableTableParameterNameDiscoverer()
+            val parameterNameDiscoverer = KotlinReflectionParameterNameDiscoverer()
             val method = definition.method
+            val bean = definition.bean
 
             definition.methods.forEach { requestMethod ->
                 definition.path.forEach { path ->
                     route.route(path, HttpMethod.parse(requestMethod.name)) {
                         handle {
-                            handleParameter(
+                            val params = handleParameter(
                                 method,
                                 parameterNameDiscoverer,
                                 bindingContext,
                                 argumentResolvers
                             )
+
+                            val result = if (method.kotlinFunction != null) {
+                                method.kotlinFunction!!.callSuspend(bean, *params.toTypedArray())
+                            } else {
+                                method.invoke(bean, *params.toTypedArray())
+                            }
+
+                            call.respond(result!!)
                         }
                     }
                 }
@@ -47,7 +61,8 @@ class RouteResolver(
     }
 
     private fun generateRouteDefinitions(): List<RouteDefinition> {
-        val beans = context.getBeansWithAnnotation(RestController::class.java)
+        val beans = context.getBeansWithAnnotation(Controller::class.java).values
+//        val beans = context.getBeansOfType(RestController::class.java).values
 
         return beans.flatMap { bean ->
             val classMapping = bean.javaClass.getDeclaredAnnotation(RequestMapping::class.java)
