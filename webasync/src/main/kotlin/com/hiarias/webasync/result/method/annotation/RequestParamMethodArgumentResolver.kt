@@ -57,7 +57,7 @@ class RequestParamMethodArgumentResolver(
     companion object {
         private class RequestParamNamedValueInfo : AbstractNamedValueArgumentResolver.Companion.NamedValueInfo {
 
-            constructor() : super("", false, ValueConstants.DEFAULT_NONE)
+            constructor() : super("", true, ValueConstants.DEFAULT_NONE)
 
             constructor(annotation: RequestParam) : super(
                 annotation.name,

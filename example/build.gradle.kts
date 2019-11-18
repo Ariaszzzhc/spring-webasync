@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+apply(plugin = "org.springframework.boot")
+
 dependencies {
     implementation(project(":spring-boot-starter-webasync"))
     implementation("io.ktor:ktor-server-cio:1.2.4")
