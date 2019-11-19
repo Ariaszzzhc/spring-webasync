@@ -8,8 +8,6 @@ class DefaultWebFilterChain(
     private val chain: DefaultWebFilterChain? = null
 ) : WebFilterChain {
 
-    constructor(vararg filters: WebFilter) : this(filters.toList())
-
     override suspend fun filter(call: ApplicationCall) {
         if (this.currentFilter != null && this.chain != null) {
             invokeFilter(this.currentFilter, this.chain, call)
@@ -29,6 +27,11 @@ class DefaultWebFilterChain(
             }
 
             return chain
+        }
+
+        fun newInstance(filters: List<WebFilter>): DefaultWebFilterChain {
+            val chain = initChain(filters)
+            return DefaultWebFilterChain(filters, chain.currentFilter, chain.chain)
         }
     }
 }

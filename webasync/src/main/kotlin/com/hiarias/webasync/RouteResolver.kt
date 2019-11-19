@@ -1,5 +1,7 @@
 package com.hiarias.webasync
 
+import com.hiarias.webasync.filter.DefaultWebFilterChain
+import com.hiarias.webasync.filter.WebFilter
 import com.hiarias.webasync.result.method.HandlerMethodArgumentResolver
 import com.hiarias.webasync.result.method.annotation.CookieValueMethodArgumentResolver
 import com.hiarias.webasync.result.method.annotation.PathVariableMethodArgumentResolver
@@ -11,8 +13,10 @@ import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.route
+import org.springframework.beans.factory.getBeansOfType
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.KotlinReflectionParameterNameDiscoverer
+import org.springframework.core.OrderComparator
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -40,6 +44,10 @@ class RouteResolver(
     fun resolve(route: Route) {
         val bindingContext = BindingContext(ConfigurableWebBindingInitializer())
 
+        val filters = context.getBeansOfType<WebFilter>().values.toList()
+        OrderComparator.sort(filters)
+        val chain = DefaultWebFilterChain.newInstance(filters)
+
         generateRouteDefinitions().forEach { definition ->
             val parameterNameDiscoverer = KotlinReflectionParameterNameDiscoverer()
             val method = definition.method
@@ -49,6 +57,8 @@ class RouteResolver(
                 definition.path.forEach { path ->
                     route.route(path, HttpMethod.parse(requestMethod.name)) {
                         handle {
+                            chain.filter(call)
+
                             val params = handleParameter(
                                 method,
                                 parameterNameDiscoverer,
