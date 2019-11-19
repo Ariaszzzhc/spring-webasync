@@ -1,6 +1,5 @@
 package com.hiarias.webasync
 
-import com.hiarias.webasync.error.DefaultErrorAttributes
 import com.hiarias.webasync.result.method.HandlerMethodArgumentResolver
 import com.hiarias.webasync.result.method.annotation.*
 import io.ktor.application.call
