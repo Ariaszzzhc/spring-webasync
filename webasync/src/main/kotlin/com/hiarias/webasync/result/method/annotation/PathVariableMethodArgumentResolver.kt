@@ -13,7 +13,8 @@ class PathVariableMethodArgumentResolver(
     factory: ConfigurableBeanFactory?
 ) : AbstractNamedValueArgumentResolver(factory) {
     override fun createNamedValueInfo(parameter: MethodParameter): AbstractNamedValueArgumentResolver.Companion.NamedValueInfo {
-        val ann = parameter.getParameterAnnotation(PathVariable::class.java) ?: throw IllegalArgumentException("No PathVariable annotation")
+        val ann = parameter.getParameterAnnotation(PathVariable::class.java)
+            ?: throw IllegalArgumentException("No PathVariable annotation")
         return PathVariableNamedValueInfo(ann)
     }
 
@@ -45,6 +46,10 @@ class PathVariableMethodArgumentResolver(
 
     companion object {
         private class PathVariableNamedValueInfo(annotation: PathVariable) :
-            AbstractNamedValueArgumentResolver.Companion.NamedValueInfo(annotation.name, annotation.required, ValueConstants.DEFAULT_NONE)
+            AbstractNamedValueArgumentResolver.Companion.NamedValueInfo(
+                annotation.name,
+                annotation.required,
+                ValueConstants.DEFAULT_NONE
+            )
     }
 }

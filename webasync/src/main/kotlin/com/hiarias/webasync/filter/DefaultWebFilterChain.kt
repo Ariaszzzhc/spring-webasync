@@ -2,7 +2,6 @@ package com.hiarias.webasync.filter
 
 import io.ktor.application.ApplicationCall
 
-
 class DefaultWebFilterChain(
     val filters: List<WebFilter>,
     private val currentFilter: WebFilter? = null,
@@ -10,7 +9,6 @@ class DefaultWebFilterChain(
 ) : WebFilterChain {
 
     constructor(vararg filters: WebFilter) : this(filters.toList())
-
 
     override suspend fun filter(call: ApplicationCall) {
         if (this.currentFilter != null && this.chain != null) {
@@ -26,7 +24,7 @@ class DefaultWebFilterChain(
         private fun initChain(filters: List<WebFilter>): DefaultWebFilterChain {
             var chain = DefaultWebFilterChain(filters)
             val iterator = filters.listIterator()
-            while(iterator.hasPrevious()) {
+            while (iterator.hasPrevious()) {
                 chain = DefaultWebFilterChain(filters, iterator.previous(), chain)
             }
 

@@ -1,4 +1,4 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration = \
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.hiarias.boot.webasync.autoconfigure.NettyWebAsyncAutoConfiguration, \
   com.hiarias.boot.webasync.autoconfigure.CIOWebAsyncAutoConfiguration, \
   com.hiarias.boot.webasync.autoconfigure.ErrorHandlerAutoConfiguration

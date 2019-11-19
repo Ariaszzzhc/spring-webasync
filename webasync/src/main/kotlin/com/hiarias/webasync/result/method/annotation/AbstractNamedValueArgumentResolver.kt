@@ -72,7 +72,7 @@ abstract class AbstractNamedValueArgumentResolver(
                 val type = parameter.nestedParameterType.name
                 throw IllegalArgumentException(
                     "Name for argument type [$type] not " +
-                            "available, and parameter name information not found in class file either."
+                        "available, and parameter name information not found in class file either."
                 )
             }
         }

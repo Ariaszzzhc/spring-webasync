@@ -9,7 +9,8 @@ class RequestHeaderMethodArgumentResolver(
     factory: ConfigurableBeanFactory?
 ) : AbstractNamedValueArgumentResolver(factory) {
     override fun createNamedValueInfo(parameter: MethodParameter): AbstractNamedValueArgumentResolver.Companion.NamedValueInfo {
-        val ann = parameter.getParameterAnnotation(RequestHeader::class.java) ?: throw IllegalStateException("No RequestHeader annotation")
+        val ann = parameter.getParameterAnnotation(RequestHeader::class.java)
+            ?: throw IllegalStateException("No RequestHeader annotation")
 
         return RequestHeaderNamedValueInfo(ann)
     }
@@ -33,6 +34,10 @@ class RequestHeaderMethodArgumentResolver(
 
     companion object {
         private class RequestHeaderNamedValueInfo constructor(annotation: RequestHeader) :
-            AbstractNamedValueArgumentResolver.Companion.NamedValueInfo(annotation.name, annotation.required, annotation.defaultValue)
+            AbstractNamedValueArgumentResolver.Companion.NamedValueInfo(
+                annotation.name,
+                annotation.required,
+                annotation.defaultValue
+            )
     }
 }

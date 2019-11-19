@@ -11,7 +11,8 @@ class CookieValueMethodArgumentResolver(
     factory: ConfigurableBeanFactory?
 ) : AbstractNamedValueArgumentResolver(factory) {
     override fun createNamedValueInfo(parameter: MethodParameter): AbstractNamedValueArgumentResolver.Companion.NamedValueInfo {
-        val ann = parameter.getParameterAnnotation(CookieValue::class.java) ?: throw IllegalArgumentException("No CookieValue annotation")
+        val ann = parameter.getParameterAnnotation(CookieValue::class.java)
+            ?: throw IllegalArgumentException("No CookieValue annotation")
 
         return CookieValueNamedValueInfo(ann)
     }
@@ -39,6 +40,10 @@ class CookieValueMethodArgumentResolver(
 
     companion object {
         private class CookieValueNamedValueInfo constructor(annotation: CookieValue) :
-            AbstractNamedValueArgumentResolver.Companion.NamedValueInfo(annotation.name, annotation.required, annotation.defaultValue)
+            AbstractNamedValueArgumentResolver.Companion.NamedValueInfo(
+                annotation.name,
+                annotation.required,
+                annotation.defaultValue
+            )
     }
 }

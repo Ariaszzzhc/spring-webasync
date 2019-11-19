@@ -18,7 +18,10 @@ open class BindingContext(private val initializer: WebBindingInitializer? = null
         return initDataBinder(dataBinder, applicationCall)
     }
 
-    protected open fun initDataBinder(binder: ApplicationCallDataBinder, applicationCall: ApplicationCall): ApplicationCallDataBinder {
+    protected open fun initDataBinder(
+        binder: ApplicationCallDataBinder,
+        applicationCall: ApplicationCall
+    ): ApplicationCallDataBinder {
         return binder
     }
 
