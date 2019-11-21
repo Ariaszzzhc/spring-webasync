@@ -4,7 +4,7 @@ plugins {
     id("org.springframework.boot") version "2.2.1.RELEASE" apply false
 }
 
-subprojects {
+allprojects {
     group = "com.hiarias"
     version = "0.1.0"
 

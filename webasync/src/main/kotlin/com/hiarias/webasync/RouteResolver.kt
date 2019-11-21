@@ -81,10 +81,11 @@ class RouteResolver(
 
     private fun generateRouteDefinitions(): List<RouteDefinition> {
         val beans = context.getBeansWithAnnotation(Controller::class.java).values
-//        val beans = context.getBeansOfType(RestController::class.java).values
 
         return beans.flatMap { bean ->
-            val classMapping = bean.javaClass.getDeclaredAnnotation(RequestMapping::class.java)
+            val ann = bean.javaClass.getDeclaredAnnotation(RequestMapping::class.java)
+
+            val classMapping: List<String> = ann?.value?.toList() ?: emptyList()
 
             bean.javaClass.methods.mapNotNull { method ->
                 method.getDeclaredAnnotation(RequestMapping::class.java)?.let {
@@ -100,9 +101,17 @@ class RouteResolver(
                 }
             }.apply {
                 forEach {
-                    it.path = it.path.flatMap { child ->
-                        classMapping.value.map { parent ->
-                            parent + if (child.startsWith("/")) child else "/$child"
+                    it.path = if (classMapping.isEmpty() && it.path.isEmpty()) {
+                        emptyList()
+                    } else if (classMapping.isNotEmpty() && it.path.isEmpty()) {
+                        classMapping
+                    } else if (classMapping.isEmpty() && it.path.isNotEmpty()) {
+                        it.path
+                    } else {
+                        it.path.flatMap { child ->
+                            classMapping.map { parent ->
+                                parent + if (child.startsWith("/")) child else "/$child"
+                            }
                         }
                     }
                 }
