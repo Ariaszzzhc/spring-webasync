@@ -7,13 +7,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.data.annotation.Id
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @SpringBootApplication
 class Main
@@ -29,11 +28,11 @@ data class NewPerson(val name: String)
 
 interface PersonRepository : ReactiveCrudRepository<Person, String> {
     fun findByName(name: String): Flux<Person>
+    fun findFirstByName(name: String): Mono<Person>
 }
 
 
-@Controller
-// @RequestMapping("/person")
+@RestController
 class PersonController(
     private val repository: PersonRepository
 ) {
